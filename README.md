@@ -3,7 +3,7 @@ Script to import geometry from any QGIS project to postgres layers from the tool
 
 ## Installation
 
-Simply run the tool from 
+Simply run the tool from QGIS Toolbox or copying the python script to the location specified in QGIS profile (https://docs.qgis.org/testing/en/docs/user_manual/introduction/qgis_configuration.html#working-with-user-profiles)
 
 ## Usage Overview
 
