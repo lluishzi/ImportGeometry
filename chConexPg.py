@@ -109,7 +109,7 @@ def espmin(c):
 #treu corxets i noms de taula amb punt dels camps
 def agafaNomCamp(c):
     c=c.strip()
-    p1=re.compile('\[?[^\]]+\]?\.\[?(.*)\]?').match(c)
+    p1=re.compile(r'\[?[^\]]+\]?\.\[?(.*)\]?').match(c)
     if p1:
         pa=p1[1]
         if pa[:-1]==']':
@@ -385,16 +385,22 @@ Run the tool. Output files and logs will be saved in the specified folder.
     def initAlgorithm(self, config=None):
         conn_names = QgsProviderRegistry.instance().providerMetadata("postgres").connections().keys()
         
-
         if not conn_names:
             raise Exception("⚠ No hi ha cap connexió PostGIS configurada al QGIS")
+        import_path = os.path.join(os.getcwd(), "conexpg.json")
+
+        conexpg_data = dict()
+        if os.path.exists(import_path):
+            with open(import_path, "r", encoding="utf-8") as f:
+                conexpg_data = json.load(f)
+        conexpg_data = conexpg_data.get("inputs", dict())
 
         # Add a string parameter for schema
         self.addParameter(
             QgsProcessingParameterString(
                 self.SCHEMA,
                 'Destination schema',
-                defaultValue=''
+                defaultValue=conexpg_data.get("SCHEMA","public"),
             )
         )
 
@@ -403,7 +409,7 @@ Run the tool. Output files and logs will be saved in the specified folder.
             QgsProcessingParameterString(
                 self.PERMISSIONS,
                 'Permissions',
-                defaultValue='',
+                defaultValue=conexpg_data.get("PERMISSIONS",""),
                 optional=True
             )
         )
@@ -414,7 +420,7 @@ Run the tool. Output files and logs will be saved in the specified folder.
                 self.SRID,
                 'Select SRID',
                 options=['25831','4326', '3857', '4269'],
-                defaultValue="25831"
+                defaultValue=conexpg_data.get("SRID","25831")
             )
         )
 
@@ -448,7 +454,7 @@ Run the tool. Output files and logs will be saved in the specified folder.
             QgsProcessingParameterString(
                 self.TABLE_INFO,
                 'Name of information table',
-                defaultValue='',
+                defaultValue=conexpg_data.get("TABLE_INFO","public.info_traspassos"),
                 optional=True
             )
         )
@@ -456,21 +462,21 @@ Run the tool. Output files and logs will be saved in the specified folder.
             QgsProcessingParameterBoolean(
                 self.PROC_1,
                 'Process Phase 1: Table creation',
-                defaultValue=False,
+                defaultValue=conexpg_data.get("PROC_1",False)
             )
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.RUNDB_PROC_1,
                 'Process Phase 1: Table creation - Run generated SQL',
-                defaultValue=False,
+                defaultValue=conexpg_data.get("RUNDB_PROC_1",False),
             )
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.PROC_2,
                 'Process Phase 2: Data Ingestion',
-                defaultValue=False,
+                defaultValue=conexpg_data.get("PROC_2",False),
             )
         )
         self.addParameter(
@@ -484,14 +490,14 @@ Run the tool. Output files and logs will be saved in the specified folder.
             QgsProcessingParameterBoolean(
                 self.DELEXISTINGDATA,
                 'Process Phase 2: Delete existing postgres data',
-                defaultValue=False,
+                defaultValue=conexpg_data.get("DELEXISTINGDATA",True),
             )
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.PROC_3,
                 'Process Phase 3: Project reallocation',
-                defaultValue=False,
+                defaultValue=conexpg_data.get("PROC_3",False),
             )
         )
 
