@@ -22,7 +22,7 @@ from qgis.core import (
     QgsProcessingParameterNumber,
     QgsAuthMethodConfig,
     QgsApplication
-
+ 
 )
 import re
 import subprocess
@@ -319,7 +319,8 @@ class ChConPg(QgsProcessingAlgorithm):
         return 'lluishzi_tools'
 
     def shortHelpString(self):
-        return """
+        import_path = os.path.join(os.getcwd(), "conexpg.json")
+        return f"""
 The chConexPg.py script defines a custom QGIS Processing tool for exporting vector layers to a PostGIS database, with additional options for schema, permissions, and project remapping. Here’s a breakdown of its usage, workflow, and parameters:
 
 ---
@@ -379,7 +380,10 @@ Enable Phase 2 to ingest data.
 Enable Phase 3 to update the project to use the new database sources.
 Run the tool. Output files and logs will be saved in the specified folder.
 
-          
+****Default values****
+
+If you configure default values for the tool and export them to a file named {import_path} , the tool will load these defaults when it runs.
+
 """
 
     def initAlgorithm(self, config=None):
